@@ -1,0 +1,69 @@
+# Architecture
+
+The library is implementation agnostic and does not use platform/device specific
+functions. The user implements functions and modifies main loops to cater to their
+needs. This is done in order to keep the file size small.
+
+Various drawing helpers are provided on top of pixel set and clear function,
+which are provided by the user.
+
+Main loops are Finite State Machines. There is a global state which manages the
+current screen, the current selection, edit and lock flag. It can also be
+adjusted to specific needs.
+Current screen is an enum, table screens are odd numbers bigger than 1 (3, 5,
+7..; i.e. LSB is set). Other numbers are free to be used.
+
+
+# Abstractions
+
+These are provided by the user:
+`set_pixel(int x, int y)`
+`clear_pixel(int x, int y)`
+`clear_display()`
+
++-------------+   +----------------+	      +-------------------+
+| Draw bitmap |   | Draw rectangle |	      |Translate character|
+| `draw_bmp`  |   | `draw_rect`    |	      |from ASCII to local|
++-------------+   +--+-------------+	      |bitmap font	  |
+|                    |			      |`translate_char`	  |
+|                    |		       	      +-+-----------------+
+|\                   | 	       	      	     	|
+| +----------------- + ------------- +----------+---+
+|      	       	     | 	       	     | Draw char    |
+|	   	     |		     | `draw_char`  |
+|	   	     |		     +------------+-+
+|	  	     |		       	       	  |
+|	  	     |		      	     	  |
+|	  	     |		      	     	  |
+|	  	     |		     +------------+------+
+|	  	     |		     | Draw text (string)|
+|	  	     |		     | `draw_text`     	 |
+|	  	     |		     +-------+-----------+
+|	  	     |		      	     |
+|	  	     |		      	     |
+|	  	      \		      	     |
+ \	  	       \       	      	     |
+  +---------------------+-----------+--------+----+
+ 	       	       	       	    | Draw table  |
+ 		      		    | `draw_table`|
+ 		      		    +-------------+
+
+
+				+-----------------+
+		    	    	+-----------------+
+      	       	   	    	| table		  |	   +-----------------+
+			    	|		  |	   +-----------------+
+			    	| row[]--------------------| row             |
+      	       	       	    	| length	  |	   |   		     |
+			    	+-----------------+ 	   | left    (key)   |
+			    				   |   _len          |
+			    				   |	   	     |
+			    				   | right   (value) |
+			    				   |   _len          |
+			    	       	       	       	   +-----------------+
+
+# Specific implementation
+
+Two main loops:
+* `draw_menu` for drawing
+* `send_msg` for sending messages (events, such as button press)

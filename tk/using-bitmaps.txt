@@ -1,0 +1,28 @@
+# Functions
+draw_bmp's first argument is 1-dim byte array.
+Bitmap width has to be byte-aligned.
+Individual byte represents 8 pixels laying in a vertical line.
+MSB is leftmost, LSB is rightmost.
+
+There is a problem made to avoid divisions (but there's modulo op. already, so
+maybe I should forget about that...). Width argument `w` takes a number of
+`pixels/8` (number of bytes).
+
+# Converting
+In order to load bitmaps, one has to convert png to pbm and then strip the
+header off (P4...height<whitespace>). Then, `xxd -i` can be used to get the file
+in a C array initializer.
+
+# Atlases
+Conventional way of combining multiple bitmaps into one array (an atlas) is done
+by aligning individual images in a unit width column:
+
++---+
+| 1 |
++---+
+| 2 |
++---+
+| 3 |
++---+
+
+Data is then accessed by offsetting the array. Widths are constant. 

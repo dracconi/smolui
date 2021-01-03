@@ -1,0 +1,7 @@
+.vs/
+.idea/
+cmake-build-debug
+CppProperties.json
+outline.pbm
+outline.pbm.bak
+Untitled.png
